@@ -20,13 +20,13 @@ ${(contextData.news || []).map((n, i) => `${i + 1}. ${n.title}`).join('\n')}`;
       },
       method: "POST",
       body: JSON.stringify({
-        model: "meta-llama/Llama-3.2-1B-Instruct",
+        model: "meta-llama/Llama-3.1-8B-Instruct",
         messages: [
           { role: "system", content: systemContent },
           { role: "user", content: userMessage }
         ],
-        max_tokens: 150,
-        temperature: 0.2
+        max_tokens: 250,
+        temperature: 0.5
       }),
     });
     

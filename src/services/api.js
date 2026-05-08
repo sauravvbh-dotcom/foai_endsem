@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const NEWS_API_KEY = import.meta.env.VITE_NEWS_API_KEY;
+const ISS_API_KEY = import.meta.env.VITE_ISS_API_KEY;
 
 // Cache utility for news
 const getCachedNews = (category) => {
@@ -23,15 +24,35 @@ const setCachedNews = (category, data) => {
 };
 
 export const fetchIssLocation = async () => {
-  // Using wheretheiss.at because it supports HTTPS (unlike open-notify)
-  const res = await axios.get('https://api.wheretheiss.at/v1/satellites/25544');
-  return {
-    timestamp: res.data.timestamp,
-    iss_position: {
-      latitude: res.data.latitude.toString(),
-      longitude: res.data.longitude.toString()
+  try {
+    // If user provided an N2YO API key, use it as primary
+    if (ISS_API_KEY && ISS_API_KEY !== 'your_n2yo_api_key_here') {
+      const res = await axios.get(`https://www.n2yo.com/rest/v1/satellite/positions/25544/0/0/0/1/&apiKey=${ISS_API_KEY}`);
+      if (res.data && res.data.positions && res.data.positions.length > 0) {
+        const pos = res.data.positions[0];
+        return {
+          timestamp: Math.floor(Date.now() / 1000),
+          iss_position: {
+            latitude: pos.satlatitude.toString(),
+            longitude: pos.satlongitude.toString()
+          }
+        };
+      }
     }
-  };
+    
+    // Fallback to wheretheiss.at (HTTPS compatible)
+    const res = await axios.get('https://api.wheretheiss.at/v1/satellites/25544');
+    return {
+      timestamp: res.data.timestamp,
+      iss_position: {
+        latitude: res.data.latitude.toString(),
+        longitude: res.data.longitude.toString()
+      }
+    };
+  } catch (error) {
+    console.error("ISS Fetch Error:", error);
+    throw error;
+  }
 };
 
 export const fetchAstronauts = async () => {
