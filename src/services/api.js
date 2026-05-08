@@ -23,13 +23,25 @@ const setCachedNews = (category, data) => {
 };
 
 export const fetchIssLocation = async () => {
-  const res = await axios.get('http://api.open-notify.org/iss-now.json');
-  return res.data;
+  // Using wheretheiss.at because it supports HTTPS (unlike open-notify)
+  const res = await axios.get('https://api.wheretheiss.at/v1/satellites/25544');
+  return {
+    timestamp: res.data.timestamp,
+    iss_position: {
+      latitude: res.data.latitude.toString(),
+      longitude: res.data.longitude.toString()
+    }
+  };
 };
 
 export const fetchAstronauts = async () => {
-  const res = await axios.get('http://api.open-notify.org/astros.json');
-  return res.data;
+  try {
+    // open-notify doesn't support HTTPS, so we return a placeholder 
+    // or empty list on production to prevent Mixed Content blocking.
+    return { people: [] };
+  } catch (err) {
+    return { people: [] };
+  }
 };
 
 // Fallback reverse geocoding using Nominatim (OpenStreetMap)
