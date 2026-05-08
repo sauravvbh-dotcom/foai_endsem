@@ -14,6 +14,7 @@ export function useIssData() {
     try {
       // Fetch ISS location
       const issData = await fetchIssLocation();
+      if (!issData) return; // Silent skip if rate limited
 
       // Fetch astronauts only once on mount to avoid rate limits
       // We use a local ref or a simple check in the hook
@@ -47,7 +48,7 @@ export function useIssData() {
     fetchData(); // Initial fetch
     let interval;
     if (isTracking) {
-      interval = setInterval(fetchData, 15000); // Every 15 seconds
+      interval = setInterval(fetchData, 30000); // Every 30 seconds
     }
     return () => {
       if (interval) clearInterval(interval);

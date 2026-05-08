@@ -50,8 +50,9 @@ export const fetchIssLocation = async () => {
       }
     };
   } catch (error) {
-    console.error("ISS Fetch Error:", error);
-    throw error;
+    console.warn("ISS Fetch Error (likely rate limit):", error.message);
+    // Return null so the hook knows it failed but we don't necessarily want to crash
+    return null;
   }
 };
 
