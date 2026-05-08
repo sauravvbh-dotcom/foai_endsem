@@ -25,22 +25,7 @@ const setCachedNews = (category, data) => {
 
 export const fetchIssLocation = async () => {
   try {
-    // If user provided an N2YO API key, use it as primary
-    if (ISS_API_KEY && ISS_API_KEY !== 'your_n2yo_api_key_here') {
-      const res = await axios.get(`https://www.n2yo.com/rest/v1/satellite/positions/25544/0/0/0/1/&apiKey=${ISS_API_KEY}`);
-      if (res.data && res.data.positions && res.data.positions.length > 0) {
-        const pos = res.data.positions[0];
-        return {
-          timestamp: Math.floor(Date.now() / 1000),
-          iss_position: {
-            latitude: pos.satlatitude.toString(),
-            longitude: pos.satlongitude.toString()
-          }
-        };
-      }
-    }
-    
-    // Fallback to wheretheiss.at (HTTPS compatible)
+    // Using wheretheiss.at as the robust public source (supports HTTPS)
     const res = await axios.get('https://api.wheretheiss.at/v1/satellites/25544');
     return {
       timestamp: res.data.timestamp,
@@ -50,9 +35,16 @@ export const fetchIssLocation = async () => {
       }
     };
   } catch (error) {
-    console.warn("ISS Fetch Error (likely rate limit):", error.message);
-    // Return null so the hook knows it failed but we don't necessarily want to crash
-    return null;
+    console.warn("Primary ISS API failed, trying fallback...", error.message);
+    
+    try {
+      // Fallback: Using a CORS proxy for open-notify if primary fails
+      const fallbackRes = await axios.get('https://api.allorigins.win/raw?url=http://api.open-notify.org/iss-now.json');
+      return fallbackRes.data;
+    } catch (fallbackError) {
+      console.error("All ISS API sources failed.");
+      return null;
+    }
   }
 };
 
