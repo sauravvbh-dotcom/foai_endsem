@@ -31,7 +31,7 @@ export default function IssTracker() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Stat Cards */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 bg-card border rounded-lg shadow-sm">
           <div className="flex items-center gap-4">
@@ -53,18 +53,6 @@ export default function IssTracker() {
             <div>
               <p className="text-sm font-medium text-muted-foreground">Speed</p>
               <h3 className="text-xl font-bold">{Math.round(currentSpeed).toLocaleString()} km/h</h3>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="p-6 bg-card border rounded-lg shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-green-500/10 rounded-full text-green-500">
-              <Users className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">People in Space</p>
-              <h3 className="text-xl font-bold">{astronauts.length}</h3>
             </div>
           </div>
         </motion.div>
