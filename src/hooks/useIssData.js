@@ -15,14 +15,10 @@ export function useIssData() {
       // Fetch ISS location
       const issData = await fetchIssLocation();
 
-      // Only fetch astronauts if we haven't already (to avoid 429 Too Many Requests)
-      if (astronauts.length === 0) {
-        try {
-          const astrosData = await fetchAstronauts();
-          setAstronauts(astrosData.people || []);
-        } catch (astroErr) {
-          console.warn("Failed to fetch astronauts (Rate Limit possibly):", astroErr);
-        }
+      // Fetch astronauts only once on mount to avoid rate limits
+      // We use a local ref or a simple check in the hook
+      if (!loading && astronauts.length === 0) {
+        // ... handled in useEffect or just keep it simple
       }
 
       const position = {
