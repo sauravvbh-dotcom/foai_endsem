@@ -30,27 +30,21 @@ export default function Chatbot() {
     setIsTyping(true);
 
     // Prepare context
-    let speed = 0;
+    let speed = 27600; // Default ISS speed
     let lat = 0;
     let lon = 0;
-    if (issPositions.length >= 2) {
-      const p1 = issPositions[issPositions.length - 2];
-      const p2 = issPositions[issPositions.length - 1];
-      lat = p2.latitude;
-      lon = p2.longitude;
-      // Re-calculate simple distance-based speed approximation
-      // We don't have location name easily accessible here without state, but lat/lon works.
-    } else if (issPositions.length === 1) {
-      lat = issPositions[0].latitude;
-      lon = issPositions[0].longitude;
+    
+    if (issPositions.length > 0) {
+      const current = issPositions[issPositions.length - 1];
+      lat = current.latitude;
+      lon = current.longitude;
     }
 
     const contextData = {
-      speed: speed, // Not passing accurate speed easily here without duplicating haversine logic, but we can pass 28000 km/h approx
+      speed,
       lat,
       lon,
       astronautCount: astronauts.length,
-      astronauts: astronauts,
       news: currentNews || []
     };
 

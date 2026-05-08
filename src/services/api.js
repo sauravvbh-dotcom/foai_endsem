@@ -25,24 +25,33 @@ const setCachedNews = (category, data) => {
 
 export const fetchIssLocation = async () => {
   try {
-    // Using wheretheiss.at as the robust public source (supports HTTPS)
-    const res = await axios.get('https://api.wheretheiss.at/v1/satellites/25544');
+    // Try the Vercel Serverless Proxy first (solves CORS/HTTPS/Mixed-Content)
+    const res = await axios.get('/api/iss');
+    if (res.data && res.data.iss_position) {
+      return res.data;
+    }
+    
+    // Fallback to direct public API
+    const fallbackRes = await axios.get('https://api.wheretheiss.at/v1/satellites/25544');
     return {
-      timestamp: res.data.timestamp,
+      timestamp: fallbackRes.data.timestamp,
       iss_position: {
-        latitude: res.data.latitude.toString(),
-        longitude: res.data.longitude.toString()
+        latitude: fallbackRes.data.latitude.toString(),
+        longitude: fallbackRes.data.longitude.toString()
       }
     };
   } catch (error) {
-    console.warn("Primary ISS API failed, trying fallback...", error.message);
-    
+    console.warn("ISS Proxy failed, trying direct public API...");
     try {
-      // Fallback: Using a CORS proxy for open-notify if primary fails
-      const fallbackRes = await axios.get('https://api.allorigins.win/raw?url=http://api.open-notify.org/iss-now.json');
-      return fallbackRes.data;
-    } catch (fallbackError) {
-      console.error("All ISS API sources failed.");
+      const res = await axios.get('https://api.wheretheiss.at/v1/satellites/25544');
+      return {
+        timestamp: res.data.timestamp,
+        iss_position: {
+          latitude: res.data.latitude.toString(),
+          longitude: res.data.longitude.toString()
+        }
+      };
+    } catch (err) {
       return null;
     }
   }

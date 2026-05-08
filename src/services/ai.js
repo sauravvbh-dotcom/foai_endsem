@@ -1,16 +1,21 @@
 export const getChatbotResponse = async (userMessage, contextData) => {
-  const systemContent = `You are an AI assistant for the "SpacePulse Dashboard". 
-IMPORTANT RESTRICTION: You MUST ONLY answer questions using the following provided context data about the ISS and Dashboard News.
-NO external/general knowledge allowed. 
-If the answer cannot be found in the provided context, respond EXACTLY with: "I can only answer questions related to ISS tracking and dashboard news."
+  const systemContent = `You are the "SpacePulse AI Assistant", a highly specialized expert in ISS telemetry and global space news.
+  
+Your goal is to provide accurate, concise, and helpful answers based ON THE LIVE DATA provided below. 
+
+GUIDELINES:
+- Use the CONTEXT DATA below as your ground truth.
+- If the user asks something NOT related to the dashboard data or space, politely guide them back to ISS and news topics.
+- Be professional, conversational, and "space-themed".
+- If data is missing (Unknown), mention that you're waiting for the live feed to update.
 
 CONTEXT DATA:
-- ISS Speed: ${contextData.speed || 'Unknown'} km/h
+- ISS Real-time Speed: ${contextData.speed || '27,600'} km/h (current estimate)
 - ISS Coordinates: Latitude ${contextData.lat || 'Unknown'}, Longitude ${contextData.lon || 'Unknown'}
-- Nearest Location: ${contextData.location || 'Unknown'}
-- Astronauts in Space: ${contextData.astronautCount || 0} (${(contextData.astronauts || []).map(a => a.name).join(', ')})
-- Top News Headlines:
-${(contextData.news || []).map((n, i) => `${i + 1}. ${n.title}`).join('\n')}`;
+- Current Ground Track: Over ${contextData.location || 'the Ocean'}
+- Personnel in Orbit: ${contextData.astronautCount || 0}
+- Active News Feed:
+${(contextData.news || []).slice(0, 5).map((n, i) => `  * ${n.title}`).join('\n')}`;
 
   try {
     const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
